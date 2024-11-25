@@ -1,6 +1,10 @@
 <div class="text-sm antialiased opacity-60">
   {% if page.date %}
   <time>{{ page.date | date }}</time>
+  {% if page.updated %}
+  <span class="mx-1">&middot; Updated</span>
+  <time>{{ page.updated}}</time>
+  {% endif %}
   <span class="mx-1">&middot;</span>
   <span>{{ page.reading_time }}min</span>
   {% endif %}<!---->

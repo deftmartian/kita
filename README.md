@@ -4,7 +4,7 @@ Kita is a clean, elegant and simple blog theme for Zola.
 
 This theme is based on Hugo theme [hugo-paper](https://github.com/nanxiaobei/hugo-paper) with some features added.
 
-[Demo](https://st1020.github.io/kita/)
+[Demo](https://kita-zola.pages.dev)
 
 ![Screenshot](https://raw.githubusercontent.com/st1020/kita/main/screenshot.png)
 
@@ -19,7 +19,7 @@ This theme is based on Hugo theme [hugo-paper](https://github.com/nanxiaobei/hug
 - Taxonomies support
 - Projects page
 - Archive page
-- Table of Content
+- Table of content & Floating side table of content
 - Admonition shortcode
 - SEO friendly
 - Comments using [Giscus](https://giscus.app/)

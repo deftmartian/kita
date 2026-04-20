@@ -9,8 +9,9 @@
 {% endif %}<!---->
 
 {% for page in pages %}
+{% set is_featured = loop.first and (paginator is not defined or paginator.current_index == 1) %}
 <section
-  class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
+  class="{% if is_featured %}featured-card glass-card relative mb-6 rounded-[1.4rem] p-5 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-8 lg:p-7{% else %}block-bg glass-card relative mb-4 rounded-[1.4rem] p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6{% endif %}"
 >
   {% if page.extra.cover.image %}
   <figure class="mt-0 mb-4">
@@ -22,9 +23,24 @@
   </figure>
   {% endif %}<!---->
 
-  <h2 class="my-0! pb-1 leading-none! font-bold">{{ page.title }}</h2>
+  {% if is_featured %}
+  <p
+    class="not-prose mb-3 flex items-center gap-3 text-[0.72rem] font-semibold tracking-[0.18em] text-[#8b3a1a] uppercase dark:text-[#d08a6e]"
+  >
+    <span>Latest</span>
+    <span class="h-px w-8 bg-current/35"></span>
+  </p>
+  {% endif %}
 
-  <div class="not-prose my-1 truncate">
+  <h2
+    class="my-0! pb-1 font-bold {% if is_featured %}max-w-[14ch] text-[2.1rem] lg:text-[2.8rem]{% else %}leading-none!{% endif %}"
+  >
+    {{ page.title }}
+  </h2>
+
+  <div
+    class="not-prose my-1 {% if is_featured %}line-clamp-3 max-w-2xl text-[1.05rem] leading-7 text-black/80 dark:text-white/80{% else %}line-clamp-2{% endif %}"
+  >
     {% if page.description %}
     <p>{{ page.description }}</p>
     {% elif page.summary %}<!---->
@@ -34,7 +50,23 @@
 
   {% include "partials/page_info.html" %}
 
-  <a class="absolute inset-0 text-[0px]" href="{{ page.permalink }}">{{ page.title }}</a>
+  {% if page.taxonomies.tags %}
+  <div
+    class="not-prose relative z-10 flex flex-wrap gap-x-3 gap-y-1 text-sm {% if is_featured %}mt-4{% else %}mt-3{% endif %}"
+  >
+    {% for tag in page.taxonomies.tags | slice(end=4) %}
+    <a
+      class="tag-link no-underline"
+      href="{{ get_taxonomy_url(kind='tags', name=tag) | safe }}"
+      >#{{ tag }}</a
+    >
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <a class="absolute inset-0 rounded-[inherit] text-[0px]" href="{{ page.permalink }}"
+    >{{ page.title }}</a
+  >
 </section>
 {% endfor %}
 
@@ -42,18 +74,10 @@
 {% if paginator is defined %}
 <nav class="not-prose mt-16 flex font-bold">
   {% if paginator.previous %}
-  <a
-    class="rounded-full bg-black px-4 py-3 text-sm text-white no-underline duration-100 active:scale-95 dark:bg-white/80 dark:text-black"
-    href="{{ paginator.previous }}"
-    >← Prev Page</a
-  >
+  <a class="accent-pill" href="{{ paginator.previous }}">← Prev Page</a>
   {% endif %}<!---->
   {% if paginator.next %}
-  <a
-    class="ml-auto rounded-full bg-black px-4 py-3 text-sm text-white no-underline duration-100 active:scale-95 dark:bg-white/80 dark:text-black"
-    href="{{ paginator.next }}"
-    >Next Page →</a
-  >
+  <a class="accent-pill ml-auto" href="{{ paginator.next }}">Next Page →</a>
   {% endif %}
 </nav>
 {% endif %}

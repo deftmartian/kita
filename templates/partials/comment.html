@@ -1,20 +1,78 @@
 {% if config.extra.giscus.repo %}
 <div class="giscus mt-12"></div>
 <script
-  src="https://giscus.app/client.js"
-  data-repo="{{ config.extra.giscus.repo }}"
-  data-repo-id="{{ config.extra.giscus.repo_id }}"
-  data-category="{{ config.extra.giscus.category }}"
-  data-category-id="{{ config.extra.giscus.category_id }}"
-  data-mapping="{{ config.extra.giscus.mapping | default(value=`pathname`) }}"
-  data-strict="{{ config.extra.giscus.strict | default(value=`1`) }}"
-  data-reactions-enabled="{{ config.extra.giscus.reactions_enabled | default(value=`0`) }}"
-  data-emit-metadata="{{ config.extra.giscus.emit_metadata | default(value=`0`) }}"
-  data-input-position="{{ config.extra.giscus.input_position | default(value=`top`) }}"
-  data-theme="{{ config.extra.giscus.theme | default(value=`light`) }}"
-  data-lang="{{ config.extra.giscus.lang | default(value=`en`) }}"
-  data-loading="{{ config.extra.giscus.loading | default(value=`lazy`) }}"
-  crossorigin="anonymous"
-  async
-></script>
+>
+  (() => {
+    const lightTheme = "{{ config.extra.giscus.theme | default(value=`light`) }}";
+    const darkTheme = "{{ config.extra.giscus.dark_theme | default(value=`dark_dimmed`) }}";
+    const currentTheme = () =>
+      document.documentElement.classList.contains("dark") ? "dark" : "light";
+    const resolveTheme = (theme) => (theme === "dark" ? darkTheme : lightTheme);
+
+    const syncGiscusTheme = (theme) => {
+      const iframe = document.querySelector("iframe.giscus-frame");
+      if (
+        !iframe ||
+        !iframe.src.startsWith("https://giscus.app/") ||
+        iframe.classList.contains("giscus-frame--loading")
+      ) {
+        return false;
+      }
+
+      iframe.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: resolveTheme(theme) } } },
+        "https://giscus.app",
+      );
+
+      return true;
+    };
+
+    const ensureTheme = (theme) => {
+      if (syncGiscusTheme(theme)) return;
+
+      let attempts = 0;
+      const interval = window.setInterval(() => {
+        attempts += 1;
+        if (syncGiscusTheme(theme) || attempts > 40) {
+          window.clearInterval(interval);
+        }
+      }, 250);
+    };
+
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.setAttribute("data-repo", "{{ config.extra.giscus.repo }}");
+    script.setAttribute("data-repo-id", "{{ config.extra.giscus.repo_id }}");
+    script.setAttribute("data-category", "{{ config.extra.giscus.category }}");
+    script.setAttribute("data-category-id", "{{ config.extra.giscus.category_id }}");
+    script.setAttribute(
+      "data-mapping",
+      "{{ config.extra.giscus.mapping | default(value=`pathname`) }}",
+    );
+    script.setAttribute("data-strict", "{{ config.extra.giscus.strict | default(value=`1`) }}");
+    script.setAttribute(
+      "data-reactions-enabled",
+      "{{ config.extra.giscus.reactions_enabled | default(value=`0`) }}",
+    );
+    script.setAttribute(
+      "data-emit-metadata",
+      "{{ config.extra.giscus.emit_metadata | default(value=`0`) }}",
+    );
+    script.setAttribute(
+      "data-input-position",
+      "{{ config.extra.giscus.input_position | default(value=`top`) }}",
+    );
+    script.setAttribute("data-theme", resolveTheme(currentTheme()));
+    script.setAttribute("data-lang", "{{ config.extra.giscus.lang | default(value=`en`) }}");
+    script.setAttribute(
+      "data-loading",
+      "{{ config.extra.giscus.loading | default(value=`lazy`) }}",
+    );
+
+    document.querySelector(".giscus").appendChild(script);
+    document.body.addEventListener("set-theme", (event) => ensureTheme(event.detail));
+  })();
+</script>
 {% endif %}<!---->

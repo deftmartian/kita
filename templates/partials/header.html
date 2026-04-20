@@ -4,12 +4,12 @@
   <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
     <div class="flex justify-between">
       <div class="flex items-center">
-        <a class="text-2xl font-semibold" href="{{ get_url(path=``) }}">{{ config.title }}</a>
-        <div
+        <a class="site-wordmark text-2xl" href="{{ get_url(path=``) }}">{{ config.title }}</a>
+        <button
+          type="button"
           class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0px] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:[background-position:right] dark:invert"
-          role="button"
-          aria-label="Dark"
-        ></div>
+          aria-label="Toggle dark mode"
+        ></button>
       </div>
       {% if config.extra.menu %}
       <div
@@ -62,6 +62,36 @@
       const btnDark = document.querySelector(".btn-dark");
       btnDark.addEventListener("click", () => {
         setDark(localStorage.getItem("dark") !== "true");
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        if (
+          !window.matchMedia("(pointer: fine)").matches ||
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ) {
+          return;
+        }
+
+        document.querySelectorAll(".glass-card").forEach((card) => {
+          const reset = () => {
+            card.style.setProperty("--glass-opacity", "0");
+            card.style.setProperty("--glass-x", "50%");
+            card.style.setProperty("--glass-y", "50%");
+          };
+
+          card.addEventListener("pointerenter", () => {
+            card.style.setProperty("--glass-opacity", "1");
+          });
+
+          card.addEventListener("pointermove", (event) => {
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty("--glass-x", `${event.clientX - rect.left}px`);
+            card.style.setProperty("--glass-y", `${event.clientY - rect.top}px`);
+          });
+
+          card.addEventListener("pointerleave", reset);
+          reset();
+        });
       });
     </script>
     {% if config.extra.menu %}

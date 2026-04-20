@@ -1779,7 +1779,7 @@ article {
     filter: blur(16px);
     transition: opacity 180ms ease;
   }
-  > * {
+  > *:not(a) {
     position: relative;
     z-index: 1;
   }

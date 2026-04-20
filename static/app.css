@@ -293,7 +293,7 @@ article {
     transition: opacity 180ms ease;
   }
 
-  > * {
+  > *:not(a) {
     position: relative;
     z-index: 1;
   }
